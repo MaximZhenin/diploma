@@ -55,7 +55,7 @@ def get_rid_off_clones(arr):
 def writeCSV(func):
     def wrapcsv(*args,**kwargs):
         file_exists = os.path.exists('MonitoringResult.csv')
-        with open("result_old.csv", "a", newline='') as outfile:
+        with open("MonitoringResult.csv", "a", newline='') as outfile:
             writer = csv.writer(outfile)
             if not file_exists:
               writer.writerow(['JobId', 'Period1', 'Period2', 'IsMonoton'])
@@ -124,7 +124,7 @@ def getTwoPeriod(jobid, job, lst_features, all_features=features_288_temp_1, ma=
 
 if __name__ == '__main__':
   print("Start")
-  b = np.load('student_filtered/' + '1179687_user3' + '.npz', 'r')
+  b = np.load('student_filtered/' + '1217130_user25' + '.npz', 'r')
   temp = b['a']
-  ans_new = task('1179687_user3', temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
+  ans_new = task('1217130_user25', temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
   print("two_period_alg_ans", ans_new)
