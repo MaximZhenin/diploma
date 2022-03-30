@@ -10,9 +10,14 @@ import math as m
 import logging
 from matplotlib import pyplot
 from clustering.dbscan import dbscan
+from checkmonotonic import checkOut
 import warnings
+import csv
+import os.path
+
 
 warnings.filterwarnings("ignore")
+
 
 features_288_temp_1 = {"l1_cache_miss" : 0,
               "llc_cache_miss": 1,
@@ -32,6 +37,7 @@ features_288_temp_1 = {"l1_cache_miss" : 0,
               "gpu_load":15
             }
 
+
 def get_rid_off_clones(arr):
   several_ans = np.array(list(x[1] for x in arr))
   clusterRes_avg, count = dbscan(several_ans.reshape(-1,1), 0.1, 1)
@@ -45,7 +51,31 @@ def get_rid_off_clones(arr):
 
   return period
 
-def getTwoPeriod(job, lst_features, all_features=features_288_temp_1, ma='AVG'):
+
+def writeCSV(func):
+    def wrapcsv(*args,**kwargs):
+        file_exists = os.path.exists('MonitoringResult.csv')
+        with open("result_old.csv", "a", newline='') as outfile:
+            writer = csv.writer(outfile)
+            if not file_exists:
+              writer.writerow(['JobId', 'Period1', 'Period2', 'IsMonoton'])
+            funcval= func(*args,**kwargs)
+            print(funcval)
+            writer.writerow(funcval)
+        return funcval
+    return wrapcsv
+
+@writeCSV
+def task(jobid, job, lst_features, all_features=features_288_temp_1, ma='AVG'):
+  first3 = getTwoPeriod(jobid, job, lst_features, all_features, ma)
+  print(first3)
+  if first3[1] == 0.0:
+    last = False
+  else:
+    last = checkOut(job, int(first3[1]), lst_features, all_features, ma)
+  return [*first3, last]
+
+def getTwoPeriod(jobid, job, lst_features, all_features=features_288_temp_1, ma='AVG'):
   step = 2
   if ma == 'AVG':
     start = 0
@@ -89,12 +119,12 @@ def getTwoPeriod(job, lst_features, all_features=features_288_temp_1, ma='AVG'):
       ans = np.append(ans, 0)
     else:
       ans = np.append(ans, np.mean(temp_y_pred[clusterRes_avg == max_label]))
-  return ans
+  return [jobid, ans[0], ans[1]]
 
 
 if __name__ == '__main__':
   print("Start")
   b = np.load('student_filtered/' + '1179687_user3' + '.npz', 'r')
   temp = b['a']
-  ans_new = getTwoPeriod(temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
+  ans_new = task('1179687_user3', temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
   print("two_period_alg_ans", ans_new)
