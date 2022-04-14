@@ -124,7 +124,7 @@ def getTwoPeriod(jobid, job, lst_features, all_features=features_288_temp_1, ma=
 
 if __name__ == '__main__':
   print("Start")
-  b = np.load('student_filtered/' + '1217130_user25' + '.npz', 'r')
-  temp = b['a']
-  ans_new = task('1217130_user25', temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
+  b = np.load('job_data_original/job_data_original/1353891.npy', 'r')
+  temp = b
+  ans_new = task('1353891', temp, ['l1_cache_miss', 'llc_cache_miss', 'cpu_user', 'loadavg', 'ib_rcv_pckts_fs', 'ib_xmit_pckts_fs'])
   print("two_period_alg_ans", ans_new)
